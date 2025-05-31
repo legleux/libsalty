@@ -1,6 +1,6 @@
 from conan import ConanFile
 from conan.tools.build import check_max_cppstd, check_min_cppstd
-from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
+from conan.tools.cmake import CMake, cmake_layout
 from conan.tools.scm import Git
 
 
@@ -20,7 +20,7 @@ class saltyRecipe(ConanFile):
     options = {"shared": [True, False], "fPIC": [True, False]}
     default_options = {"shared": False, "fPIC": True}
 
-    generators = "CMakeDeps"
+    generators = "CMakeDeps", "CMakeToolchain"
 
     # Sources are located in the same place as this recipe, copy them to the recipe
     exports_sources = ("CMakeLists.txt", "src/*", "include/*")
@@ -33,11 +33,12 @@ class saltyRecipe(ConanFile):
         self.requires("fmt/8.1.1")
 
     def source(self):
+        print(f"Source folder is: {self.source_folder}")
         git = Git(self)
-        git.clone(url="https://github.com/conan-io/libhello.git", target=".")
+        git.clone(url="https://github.com/legleux/libsalty.git", target=".")
         # Please, be aware that using the head of the branch instead of an immutable tag
         # or commit is not a good practice in general
-        git.checkout("require_fmt")
+        # git.checkout("require_fmt")
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -50,14 +51,14 @@ class saltyRecipe(ConanFile):
     def layout(self):
         cmake_layout(self)
 
-    def generate(self):
-        # if this generate method is all the defaults, it could be simplified to an
-        # attribute e.g. generators = "CMakeToolchain"
-        # This is what translates the conan options to CMake options
-        deps = CMakeDeps(self)
-        deps.generate()
-        tc = CMakeToolchain(self)
-        tc.generate()
+    # def generate(self):
+    #     # if this generate method is all the defaults, it could be simplified to an
+    #     # attribute e.g. generators = "CMakeToolchain"
+    #     # This is what translates the conan options to CMake options
+    #     deps = CMakeDeps(self)
+    #     deps.generate()
+    #     tc = CMakeToolchain(self)
+    #     tc.generate()
 
     def build(self):
         cmake = CMake(self)
